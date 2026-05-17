@@ -1,12 +1,12 @@
 ---
-name: tech-debt-audit
-description: Thorough, user-invoked tech debt and architecture audit of the current codebase. Produces TECH_DEBT_AUDIT.md with file-cited findings, severity, effort estimates, and a required "looks bad but is actually fine" section. Use when the user asks for a debt audit, codebase health check, architecture review, or code quality assessment of an entire repo. Does not auto-invoke.
+name: audit-tech-debt
+description: Thorough, user-invoked tech debt and architecture audit of the current codebase. Produces audit file as specified with file-cited findings, severity, effort estimates, and a required "looks bad but is actually fine" section. Use when the user asks for a debt audit, codebase health check, architecture review, or code quality assessment of an entire repo. Does not auto-invoke.
 disable-model-invocation: true
 ---
 
 # Tech Debt Audit
 
-A Claude Code skill that conducts a deliberate, opinionated audit of an entire codebase and produces `TECH_DEBT_AUDIT.md` with cited findings.
+A Claude Code skill that conducts a deliberate, opinionated audit of an entire codebase and produces the audit file with cited findings.
 
 When invoked via `/tech-debt-audit`, follow the protocol below. Everything from here through the `---` divider is the protocol Claude executes. The section after the divider is documentation for humans installing or maintaining this skill.
 
@@ -55,8 +55,12 @@ Use `rg`, `ast-grep`, and language-native tooling to find concrete examples. Cit
 
 ## Phase 3: Deliverable
 
-Write to `TECH_DEBT_AUDIT.md` in the repo root with this structure:
+### File Naming and Location
 
+- Create markdown file `analysis/nnn-analysis.{project-name}{.subproject?}.md` where nnn starts at 940 (analysis range).  This file is known as the audit file.
+- Use existing file naming conventions *and required YAML frontmatter* from `file-naming-conventions.md`.
+
+### File Contents
 - **Executive summary** — max 10 bullets, ranked by impact.
 - **Architectural mental model** — your understanding of the system as it actually is.
 - **Findings table** — columns: `ID | Category | File:Line | Severity (Critical/High/Medium/Low) | Effort (S/M/L) | Description | Recommendation`. Aim for 30–80 findings; padding past that is noise.
@@ -92,30 +96,30 @@ Each subagent gets: scope (one module), the dimensions list above, the citation 
 
 ## Repeat-run mode
 
-If `TECH_DEBT_AUDIT.md` already exists in the repo, read it first. Mark resolved findings as `RESOLVED`, update stale ones, and tag new findings with `NEW`. This turns the audit into a living document tracked over time.
+If audit file already as specified here exists in the repo, read it first. Mark resolved findings as `RESOLVED`, update stale ones, and tag new findings with `NEW`. This turns the audit into a living document tracked over time.
 
 ---
 
 # Project documentation
 
-Everything below is for humans installing, using, or contributing to this skill. It is not part of the audit protocol.
+Everything below is for humans installing, using, or contributing to this skill. It is not part of the audit protocol.  Notee that these instructions are updated to install the fork, which updates the skill name to `audit-tech-debt` to consolidate it with similar audit skills, and updates the output file name to `nnn-analysis.{project-name}{.subproject?}.md` to fit the existing analysis file naming convention. 
 
 ## Installation
 
 Personal install (available across all your projects):
 
 ```bash
-mkdir -p ~/.claude/skills/tech-debt-audit
+mkdir -p ~/.claude/skills/audit-tech-debt
 ```
 
 ```bash
-curl -o ~/.claude/skills/tech-debt-audit/SKILL.md https://raw.githubusercontent.com/ksimback/tech-debt-skill/main/SKILL.md
+curl -o ~/.claude/skills/audit-tech-debt/SKILL.md https://raw.githubusercontent.com/ecorkran/tech-debt-skill/main/SKILL.md
 ```
 
 Or for a project-only install (just this repo):
 
 ```bash
-mkdir -p .claude/skills/tech-debt-audit && cp /path/to/SKILL.md .claude/skills/tech-debt-audit/SKILL.md
+mkdir -p .claude/skills/audit-tech-debt && cp /path/to/SKILL.md .claude/skills/audit-tech-debt/SKILL.md
 ```
 
 Verify it loaded:
@@ -129,10 +133,10 @@ echo "/skills" | claude
 In Claude Code, in the repo you want audited:
 
 ```
-/tech-debt-audit
+/audit-tech-debt
 ```
 
-That's it. Output goes to `TECH_DEBT_AUDIT.md` in the repo root. First run takes 5–20 minutes depending on repo size; subsequent runs in repeat-run mode are faster.
+That's it. Output goes to audit file as specified. First run takes 5–20 minutes depending on repo size; subsequent runs in repeat-run mode are faster.
 
 ## Philosophy
 
@@ -148,7 +152,7 @@ The skill also explicitly forbids recommending rewrites and forbids padding cate
 
 ## What you get
 
-`TECH_DEBT_AUDIT.md` looks like this in shape:
+Audit file looks like this in shape:
 
 ```
 # Tech Debt Audit — <repo name>
@@ -186,7 +190,7 @@ The system is a [...]
 
 ## Adaptation notes
 
-**Project-level overrides.** A `.claude/skills/tech-debt-audit/SKILL.md` in a specific repo overrides the global one. Useful when a project needs custom dimensions — e.g., an agent codebase might add "prompt injection surface area" or "tool-call cost per turn" as audit categories.
+**Project-level overrides.** A `.claude/skills/audit-tech-debt/SKILL.md` in a specific repo overrides the global one. Useful when a project needs custom dimensions — e.g., an agent codebase might add "prompt injection surface area" or "tool-call cost per turn" as audit categories.
 
 **Mid-audit course correction.** After Phase 1 completes, you can interrupt with: *"Before Phase 2, tell me what surprised you in Phase 1 and what you want to investigate that isn't in the dimensions list."* The best findings often come from things the prompt didn't anticipate. Worth doing on first run for any new codebase.
 
@@ -204,7 +208,7 @@ It won't catch business-logic bugs. Those require domain knowledge the model doe
 
 It can't tell intentional simplicity from accidental simplicity. The "open questions" section exists for exactly this reason — when in doubt, the skill asks rather than assuming.
 
-For very large repos (>200k LOC), even subagent dispatch can produce shallow results. Consider scoping to a module: `/tech-debt-audit src/payments`.
+For very large repos (>200k LOC), even subagent dispatch can produce shallow results. Consider scoping to a module: `/audit-tech-debt src/payments`.
 
 ## Contributing
 
