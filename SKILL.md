@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 A Claude Code skill that conducts a deliberate, opinionated audit of an entire codebase and produces the audit file with cited findings.
 
-When invoked via `/tech-debt-audit`, follow the protocol below. Everything from here through the `---` divider is the protocol Claude executes. The section after the divider is documentation for humans installing or maintaining this skill.
+When invoked via `/audit-tech-debt`, follow the protocol below. Everything from here through the `---` divider is the protocol Claude executes. The section after the divider is documentation for humans installing or maintaining this skill.
 
 ---
 
